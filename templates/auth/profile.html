@@ -1,0 +1,89 @@
+{% extends "base.html" %}
+
+{% block title %}プロフィール - FuelCommit{% endblock %}
+
+{% block content %}
+<div class="row justify-content-center">
+    <div class="col-md-8 col-lg-6">
+        <div class="card shadow">
+            <div class="card-body p-4">
+                <h2 class="card-title mb-4">
+                    <i class="bi bi-person-gear"></i> プロフィール編集
+                </h2>
+
+                <form method="POST">
+                    <div class="mb-3">
+                        <label for="name" class="form-label">表示名</label>
+                        <input type="text" class="form-control" id="name" name="name"
+                               value="{{ current_user.name }}" required>
+                    </div>
+
+                    <div class="mb-3">
+                        <label class="form-label">メールアドレス</label>
+                        <input type="email" class="form-control" value="{{ current_user.email }}" disabled>
+                        <div class="form-text">メールアドレスは変更できません</div>
+                    </div>
+
+                    <hr>
+                    <h5 class="mb-3">身体情報</h5>
+
+                    <div class="row">
+                        <div class="col-md-6 mb-3">
+                            <label for="gender" class="form-label">性別</label>
+                            <select class="form-select" id="gender" name="gender">
+                                <option value="">選択してください</option>
+                                <option value="male" {% if current_user.gender == 'male' %}selected{% endif %}>男性</option>
+                                <option value="female" {% if current_user.gender == 'female' %}selected{% endif %}>女性</option>
+                            </select>
+                        </div>
+                        <div class="col-md-6 mb-3">
+                            <label for="age" class="form-label">年齢</label>
+                            <input type="number" class="form-control" id="age" name="age"
+                                   value="{{ current_user.age or '' }}" min="10" max="120">
+                        </div>
+                    </div>
+
+                    <div class="row">
+                        <div class="col-md-4 mb-3">
+                            <label for="height" class="form-label">身長 (cm)</label>
+                            <input type="number" class="form-control" id="height" name="height"
+                                   value="{{ current_user.height or '' }}" step="0.1" min="100" max="250">
+                        </div>
+                        <div class="col-md-4 mb-3">
+                            <label for="current_weight" class="form-label">現在体重 (kg)</label>
+                            <input type="number" class="form-control" id="current_weight" name="current_weight"
+                                   value="{{ current_user.current_weight or '' }}" step="0.1" min="30" max="200">
+                        </div>
+                        <div class="col-md-4 mb-3">
+                            <label for="target_weight" class="form-label">目標体重 (kg)</label>
+                            <input type="number" class="form-control" id="target_weight" name="target_weight"
+                                   value="{{ current_user.target_weight or '' }}" step="0.1" min="30" max="200">
+                        </div>
+                    </div>
+
+                    <div class="mb-3">
+                        <label for="activity_level" class="form-label">活動レベル</label>
+                        <select class="form-select" id="activity_level" name="activity_level">
+                            <option value="1.2" {% if current_user.activity_level == 1.2 %}selected{% endif %}>ほぼ運動しない（デスクワーク中心）</option>
+                            <option value="1.375" {% if current_user.activity_level == 1.375 %}selected{% endif %}>軽い運動（週1-3回）</option>
+                            <option value="1.55" {% if current_user.activity_level == 1.55 %}selected{% endif %}>適度な運動（週3-5回）</option>
+                            <option value="1.725" {% if current_user.activity_level == 1.725 %}selected{% endif %}>激しい運動（週6-7回）</option>
+                            <option value="1.9" {% if current_user.activity_level == 1.9 %}selected{% endif %}>非常に激しい運動（アスリート）</option>
+                        </select>
+                    </div>
+
+                    {% if current_user.calculate_bmr() %}
+                    <div class="alert alert-info">
+                        <strong>基礎代謝量 (BMR):</strong> {{ current_user.calculate_bmr() }} kcal/日<br>
+                        <strong>1日の消費カロリー (TDEE):</strong> {{ current_user.calculate_tdee() }} kcal/日
+                    </div>
+                    {% endif %}
+
+                    <button type="submit" class="btn btn-primary">更新する</button>
+                    <a href="{{ url_for('dashboard.index') }}" class="btn btn-outline-secondary">キャンセル</a>
+                </form>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}

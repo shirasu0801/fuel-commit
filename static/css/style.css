@@ -1,0 +1,201 @@
+/* FuelCommit - カスタムスタイル */
+
+:root {
+    --primary-color: #0d6efd;
+    --success-color: #198754;
+    --warning-color: #ffc107;
+    --danger-color: #dc3545;
+}
+
+body {
+    min-height: 100vh;
+    display: flex;
+    flex-direction: column;
+}
+
+main {
+    flex: 1;
+}
+
+/* ナビゲーション */
+.navbar-brand {
+    font-weight: bold;
+}
+
+/* カード */
+.card {
+    border: none;
+    box-shadow: 0 0.125rem 0.25rem rgba(0, 0, 0, 0.075);
+}
+
+.card-header {
+    background-color: #f8f9fa;
+    border-bottom: 1px solid #e9ecef;
+}
+
+/* 栄養素表示 */
+.nutrition-value {
+    font-size: 2rem;
+    font-weight: bold;
+}
+
+.nutrition-label {
+    font-size: 0.875rem;
+    color: #6c757d;
+}
+
+/* PFCバランス */
+.pfc-protein { color: var(--danger-color); }
+.pfc-fat { color: var(--warning-color); }
+.pfc-carbs { color: var(--success-color); }
+
+/* フォーム */
+.form-label {
+    font-weight: 500;
+}
+
+.form-control:focus,
+.form-select:focus {
+    border-color: var(--primary-color);
+    box-shadow: 0 0 0 0.25rem rgba(13, 110, 253, 0.15);
+}
+
+/* 食品検索結果 */
+#search-results {
+    position: absolute;
+    z-index: 1000;
+    width: calc(100% - 2rem);
+    max-height: 300px;
+    overflow-y: auto;
+}
+
+#search-results .list-group-item {
+    cursor: pointer;
+}
+
+#search-results .list-group-item:hover {
+    background-color: #f8f9fa;
+}
+
+/* 食品アイテムカード */
+#food-items .card {
+    transition: all 0.2s ease;
+}
+
+#food-items .card:hover {
+    box-shadow: 0 0.25rem 0.5rem rgba(0, 0, 0, 0.1);
+}
+
+/* アラート */
+.alert {
+    border: none;
+}
+
+.alert-info {
+    background-color: #e7f3ff;
+    color: #0c63e4;
+}
+
+.alert-warning {
+    background-color: #fff3cd;
+    color: #856404;
+}
+
+.alert-danger {
+    background-color: #f8d7da;
+    color: #721c24;
+}
+
+/* テーブル */
+.table th {
+    font-weight: 600;
+}
+
+/* プログレスバー */
+.progress {
+    border-radius: 10px;
+    background-color: #e9ecef;
+}
+
+.progress-bar {
+    border-radius: 10px;
+}
+
+/* バッジ */
+.badge {
+    font-weight: 500;
+}
+
+/* レスポンシブ調整 */
+@media (max-width: 768px) {
+    .nutrition-value {
+        font-size: 1.5rem;
+    }
+
+    .fs-1 {
+        font-size: 2rem !important;
+    }
+
+    .fs-2 {
+        font-size: 1.5rem !important;
+    }
+
+    .fs-3 {
+        font-size: 1.25rem !important;
+    }
+}
+
+/* チャート コンテナ */
+.chart-container {
+    position: relative;
+    height: 300px;
+    width: 100%;
+}
+
+/* ログインページ */
+.login-container {
+    max-width: 400px;
+    margin: 0 auto;
+}
+
+/* フッター */
+footer {
+    background-color: #f8f9fa;
+}
+
+/* アニメーション */
+.fade-in {
+    animation: fadeIn 0.3s ease-in;
+}
+
+@keyframes fadeIn {
+    from { opacity: 0; }
+    to { opacity: 1; }
+}
+
+/* ホバーエフェクト */
+.btn {
+    transition: all 0.2s ease;
+}
+
+.card {
+    transition: box-shadow 0.2s ease;
+}
+
+.card:hover {
+    box-shadow: 0 0.5rem 1rem rgba(0, 0, 0, 0.1);
+}
+
+/* 食事タイプバッジ */
+.meal-type-badge {
+    display: inline-block;
+    padding: 0.25rem 0.75rem;
+    border-radius: 20px;
+    font-size: 0.875rem;
+    font-weight: 500;
+}
+
+.meal-type-breakfast { background-color: #fff3cd; color: #856404; }
+.meal-type-lunch { background-color: #d4edda; color: #155724; }
+.meal-type-dinner { background-color: #cce5ff; color: #004085; }
+.meal-type-snack { background-color: #f8d7da; color: #721c24; }

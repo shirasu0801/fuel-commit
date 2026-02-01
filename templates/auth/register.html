@@ -1,0 +1,97 @@
+{% extends "base.html" %}
+
+{% block title %}新規登録 - FuelCommit{% endblock %}
+
+{% block content %}
+<div class="row justify-content-center">
+    <div class="col-md-8 col-lg-6">
+        <div class="card shadow">
+            <div class="card-body p-4">
+                <h2 class="card-title text-center mb-4">
+                    <i class="bi bi-person-plus"></i> 新規登録
+                </h2>
+
+                <form method="POST">
+                    <h5 class="mb-3">基本情報（必須）</h5>
+
+                    <div class="mb-3">
+                        <label for="name" class="form-label">表示名 <span class="text-danger">*</span></label>
+                        <input type="text" class="form-control" id="name" name="name" required>
+                    </div>
+
+                    <div class="mb-3">
+                        <label for="email" class="form-label">メールアドレス <span class="text-danger">*</span></label>
+                        <input type="email" class="form-control" id="email" name="email" required>
+                    </div>
+
+                    <div class="row">
+                        <div class="col-md-6 mb-3">
+                            <label for="password" class="form-label">パスワード <span class="text-danger">*</span></label>
+                            <input type="password" class="form-control" id="password" name="password" required minlength="6">
+                            <div class="form-text">6文字以上</div>
+                        </div>
+                        <div class="col-md-6 mb-3">
+                            <label for="password_confirm" class="form-label">パスワード（確認） <span class="text-danger">*</span></label>
+                            <input type="password" class="form-control" id="password_confirm" name="password_confirm" required>
+                        </div>
+                    </div>
+
+                    <hr>
+                    <h5 class="mb-3">身体情報（任意）</h5>
+                    <p class="text-muted small">カロリー目標を計算するために使用します</p>
+
+                    <div class="row">
+                        <div class="col-md-6 mb-3">
+                            <label for="gender" class="form-label">性別</label>
+                            <select class="form-select" id="gender" name="gender">
+                                <option value="">選択してください</option>
+                                <option value="male">男性</option>
+                                <option value="female">女性</option>
+                            </select>
+                        </div>
+                        <div class="col-md-6 mb-3">
+                            <label for="age" class="form-label">年齢</label>
+                            <input type="number" class="form-control" id="age" name="age" min="10" max="120">
+                        </div>
+                    </div>
+
+                    <div class="row">
+                        <div class="col-md-4 mb-3">
+                            <label for="height" class="form-label">身長 (cm)</label>
+                            <input type="number" class="form-control" id="height" name="height" step="0.1" min="100" max="250">
+                        </div>
+                        <div class="col-md-4 mb-3">
+                            <label for="current_weight" class="form-label">現在体重 (kg)</label>
+                            <input type="number" class="form-control" id="current_weight" name="current_weight" step="0.1" min="30" max="200">
+                        </div>
+                        <div class="col-md-4 mb-3">
+                            <label for="target_weight" class="form-label">目標体重 (kg)</label>
+                            <input type="number" class="form-control" id="target_weight" name="target_weight" step="0.1" min="30" max="200">
+                        </div>
+                    </div>
+
+                    <div class="mb-3">
+                        <label for="activity_level" class="form-label">活動レベル</label>
+                        <select class="form-select" id="activity_level" name="activity_level">
+                            <option value="1.2">ほぼ運動しない（デスクワーク中心）</option>
+                            <option value="1.375">軽い運動（週1-3回）</option>
+                            <option value="1.55" selected>適度な運動（週3-5回）</option>
+                            <option value="1.725">激しい運動（週6-7回）</option>
+                            <option value="1.9">非常に激しい運動（アスリート）</option>
+                        </select>
+                    </div>
+
+                    <button type="submit" class="btn btn-primary w-100">登録する</button>
+                </form>
+
+                <hr>
+
+                <p class="text-center mb-0">
+                    既にアカウントをお持ちの方は<br>
+                    <a href="{{ url_for('auth.login') }}">ログイン</a>
+                </p>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}

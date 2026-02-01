@@ -1,0 +1,109 @@
+{% extends "base.html" %}
+
+{% block title %}食事詳細 - FuelCommit{% endblock %}
+
+{% block content %}
+<div class="row justify-content-center">
+    <div class="col-lg-8">
+        <div class="card shadow">
+            <div class="card-header d-flex justify-content-between align-items-center">
+                <h4 class="mb-0">
+                    {{ meal.date.strftime('%Y年%m月%d日') }} - {{ meal.get_meal_type_display() }}
+                </h4>
+                <div>
+                    <a href="{{ url_for('meals.edit', meal_id=meal.id) }}" class="btn btn-outline-primary btn-sm">
+                        <i class="bi bi-pencil"></i> 編集
+                    </a>
+                    <form action="{{ url_for('meals.delete', meal_id=meal.id) }}" method="POST" class="d-inline"
+                          onsubmit="return confirm('この食事を削除しますか？')">
+                        <button type="submit" class="btn btn-outline-danger btn-sm">
+                            <i class="bi bi-trash"></i> 削除
+                        </button>
+                    </form>
+                </div>
+            </div>
+            <div class="card-body">
+                {% set nutrition = meal.get_total_nutrition() %}
+
+                <!-- 合計栄養素 -->
+                <div class="row text-center mb-4">
+                    <div class="col">
+                        <div class="fs-3 fw-bold text-primary">{{ nutrition.calories }}</div>
+                        <small class="text-muted">kcal</small>
+                    </div>
+                    <div class="col">
+                        <div class="fs-3 fw-bold text-danger">{{ nutrition.protein }}g</div>
+                        <small class="text-muted">タンパク質</small>
+                    </div>
+                    <div class="col">
+                        <div class="fs-3 fw-bold text-warning">{{ nutrition.fat }}g</div>
+                        <small class="text-muted">脂質</small>
+                    </div>
+                    <div class="col">
+                        <div class="fs-3 fw-bold text-success">{{ nutrition.carbs }}g</div>
+                        <small class="text-muted">炭水化物</small>
+                    </div>
+                </div>
+
+                <!-- 食品リスト -->
+                <h5 class="mb-3">食品一覧</h5>
+                <table class="table table-hover">
+                    <thead>
+                        <tr>
+                            <th>食品名</th>
+                            <th class="text-end">量</th>
+                            <th class="text-end">カロリー</th>
+                            <th class="text-end">P</th>
+                            <th class="text-end">F</th>
+                            <th class="text-end">C</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        {% for item in meal.items %}
+                        {% set item_nutrition = item.get_nutrition() %}
+                        <tr>
+                            <td>{{ item.food.name }}</td>
+                            <td class="text-end">{{ item.quantity }}g</td>
+                            <td class="text-end">{{ item_nutrition.calories }} kcal</td>
+                            <td class="text-end">{{ item_nutrition.protein }}g</td>
+                            <td class="text-end">{{ item_nutrition.fat }}g</td>
+                            <td class="text-end">{{ item_nutrition.carbs }}g</td>
+                        </tr>
+                        {% endfor %}
+                    </tbody>
+                    <tfoot class="table-light">
+                        <tr>
+                            <th>合計</th>
+                            <th></th>
+                            <th class="text-end">{{ nutrition.calories }} kcal</th>
+                            <th class="text-end">{{ nutrition.protein }}g</th>
+                            <th class="text-end">{{ nutrition.fat }}g</th>
+                            <th class="text-end">{{ nutrition.carbs }}g</th>
+                        </tr>
+                    </tfoot>
+                </table>
+
+                <!-- その他栄養素 -->
+                <div class="row mt-4">
+                    <div class="col-md-6">
+                        <div class="card bg-light">
+                            <div class="card-body">
+                                <h6 class="card-title">その他の栄養素</h6>
+                                <ul class="list-unstyled mb-0">
+                                    <li>食物繊維: {{ nutrition.fiber }}g</li>
+                                    <li>ナトリウム: {{ nutrition.sodium }}mg</li>
+                                </ul>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <div class="card-footer">
+                <a href="{{ url_for('meals.index', date=meal.date.strftime('%Y-%m-%d')) }}" class="btn btn-outline-secondary">
+                    <i class="bi bi-arrow-left"></i> 戻る
+                </a>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}

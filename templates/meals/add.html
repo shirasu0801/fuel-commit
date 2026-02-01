@@ -1,0 +1,225 @@
+{% extends "base.html" %}
+
+{% block title %}食事を追加 - FuelCommit{% endblock %}
+
+{% block content %}
+<div class="row justify-content-center">
+    <div class="col-lg-8">
+        <div class="card shadow">
+            <div class="card-body p-4">
+                <h2 class="card-title mb-4">
+                    <i class="bi bi-plus-circle"></i> 食事を追加
+                </h2>
+
+                <form method="POST" id="meal-form">
+                    <div class="row mb-3">
+                        <div class="col-md-6">
+                            <label for="date" class="form-label">日付 <span class="text-danger">*</span></label>
+                            <input type="date" class="form-control" id="date" name="date"
+                                   value="{{ today.strftime('%Y-%m-%d') }}" required>
+                        </div>
+                        <div class="col-md-6">
+                            <label for="meal_type" class="form-label">食事タイプ <span class="text-danger">*</span></label>
+                            <select class="form-select" id="meal_type" name="meal_type" required>
+                                <option value="breakfast">朝食</option>
+                                <option value="lunch">昼食</option>
+                                <option value="dinner">夕食</option>
+                                <option value="snack">間食</option>
+                            </select>
+                        </div>
+                    </div>
+
+                    <hr>
+
+                    <h5 class="mb-3">食品を追加</h5>
+
+                    <!-- 食品検索 -->
+                    <div class="mb-3">
+                        <label for="food-search" class="form-label">食品を検索</label>
+                        <input type="text" class="form-control" id="food-search"
+                               placeholder="食品名を入力...">
+                        <div id="search-results" class="list-group mt-1"></div>
+                    </div>
+
+                    <!-- 追加済み食品リスト -->
+                    <div id="food-items" class="mb-3">
+                        <!-- 動的に追加される -->
+                    </div>
+
+                    <!-- 食品選択（フォールバック） -->
+                    <div class="mb-3">
+                        <label class="form-label">または食品リストから選択</label>
+                        <select class="form-select" id="food-select">
+                            <option value="">-- 食品を選択 --</option>
+                            {% for food in foods %}
+                            <option value="{{ food.id }}"
+                                    data-name="{{ food.name }}"
+                                    data-calories="{{ food.calories }}"
+                                    data-protein="{{ food.protein }}"
+                                    data-fat="{{ food.fat }}"
+                                    data-carbs="{{ food.carbs }}">
+                                {{ food.name }} ({{ food.category }}) - {{ food.calories }}kcal/100g
+                            </option>
+                            {% endfor %}
+                        </select>
+                        <div class="mt-2">
+                            <button type="button" class="btn btn-outline-primary btn-sm" id="add-food-btn">
+                                <i class="bi bi-plus"></i> 追加
+                            </button>
+                        </div>
+                    </div>
+
+                    <hr>
+
+                    <!-- 合計表示 -->
+                    <div class="alert alert-info" id="totals">
+                        <strong>合計:</strong>
+                        <span id="total-calories">0</span> kcal |
+                        P: <span id="total-protein">0</span>g |
+                        F: <span id="total-fat">0</span>g |
+                        C: <span id="total-carbs">0</span>g
+                    </div>
+
+                    <button type="submit" class="btn btn-primary">
+                        <i class="bi bi-check-circle"></i> 記録する
+                    </button>
+                    <a href="{{ url_for('meals.index') }}" class="btn btn-outline-secondary">
+                        キャンセル
+                    </a>
+                </form>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}
+
+{% block scripts %}
+<script>
+    const foodItems = [];
+    const foodSelect = document.getElementById('food-select');
+    const foodItemsContainer = document.getElementById('food-items');
+    const addFoodBtn = document.getElementById('add-food-btn');
+    const searchInput = document.getElementById('food-search');
+    const searchResults = document.getElementById('search-results');
+
+    function updateTotals() {
+        let calories = 0, protein = 0, fat = 0, carbs = 0;
+
+        foodItems.forEach(item => {
+            const ratio = item.quantity / 100;
+            calories += item.calories * ratio;
+            protein += item.protein * ratio;
+            fat += item.fat * ratio;
+            carbs += item.carbs * ratio;
+        });
+
+        document.getElementById('total-calories').textContent = Math.round(calories);
+        document.getElementById('total-protein').textContent = Math.round(protein * 10) / 10;
+        document.getElementById('total-fat').textContent = Math.round(fat * 10) / 10;
+        document.getElementById('total-carbs').textContent = Math.round(carbs * 10) / 10;
+    }
+
+    function renderFoodItems() {
+        foodItemsContainer.innerHTML = foodItems.map((item, index) => `
+            <div class="card mb-2">
+                <div class="card-body py-2 px-3">
+                    <div class="d-flex justify-content-between align-items-center">
+                        <div>
+                            <strong>${item.name}</strong>
+                            <small class="text-muted ms-2">${item.calories}kcal/100g</small>
+                        </div>
+                        <div class="d-flex align-items-center">
+                            <input type="hidden" name="food_id[]" value="${item.id}">
+                            <input type="number" name="quantity[]" class="form-control form-control-sm me-2"
+                                   style="width: 80px" value="${item.quantity}" min="1" step="1"
+                                   onchange="updateQuantity(${index}, this.value)">
+                            <span class="me-2">g</span>
+                            <button type="button" class="btn btn-sm btn-outline-danger" onclick="removeFood(${index})">
+                                <i class="bi bi-trash"></i>
+                            </button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        `).join('');
+
+        updateTotals();
+    }
+
+    function addFood(id, name, calories, protein, fat, carbs, quantity = 100) {
+        foodItems.push({
+            id: id,
+            name: name,
+            calories: parseFloat(calories),
+            protein: parseFloat(protein),
+            fat: parseFloat(fat),
+            carbs: parseFloat(carbs),
+            quantity: quantity
+        });
+        renderFoodItems();
+    }
+
+    function removeFood(index) {
+        foodItems.splice(index, 1);
+        renderFoodItems();
+    }
+
+    function updateQuantity(index, value) {
+        foodItems[index].quantity = parseInt(value) || 0;
+        updateTotals();
+    }
+
+    // ドロップダウンから追加
+    addFoodBtn.addEventListener('click', () => {
+        const option = foodSelect.options[foodSelect.selectedIndex];
+        if (option.value) {
+            addFood(
+                option.value,
+                option.dataset.name,
+                option.dataset.calories,
+                option.dataset.protein,
+                option.dataset.fat,
+                option.dataset.carbs
+            );
+            foodSelect.value = '';
+        }
+    });
+
+    // 検索機能
+    let searchTimeout;
+    searchInput.addEventListener('input', () => {
+        clearTimeout(searchTimeout);
+        const query = searchInput.value.trim();
+
+        if (query.length < 1) {
+            searchResults.innerHTML = '';
+            return;
+        }
+
+        searchTimeout = setTimeout(async () => {
+            try {
+                const response = await fetch(`/meals/api/foods/search?q=${encodeURIComponent(query)}`);
+                const foods = await response.json();
+
+                searchResults.innerHTML = foods.map(food => `
+                    <button type="button" class="list-group-item list-group-item-action"
+                            onclick="addFood(${food.id}, '${food.name}', ${food.calories}, ${food.protein}, ${food.fat}, ${food.carbs}); searchInput.value=''; searchResults.innerHTML='';">
+                        ${food.name}
+                        <small class="text-muted">(${food.category}) ${food.calories}kcal/100g</small>
+                    </button>
+                `).join('');
+            } catch (e) {
+                console.error('Search error:', e);
+            }
+        }, 300);
+    });
+
+    // フォーム送信前のバリデーション
+    document.getElementById('meal-form').addEventListener('submit', (e) => {
+        if (foodItems.length === 0) {
+            e.preventDefault();
+            alert('食品を1つ以上追加してください');
+        }
+    });
+</script>
+{% endblock %}

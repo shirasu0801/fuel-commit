@@ -1,0 +1,118 @@
+{% extends "base.html" %}
+
+{% block title %}食事記録 - FuelCommit{% endblock %}
+
+{% block content %}
+<div class="d-flex justify-content-between align-items-center mb-4">
+    <h2><i class="bi bi-journal-text"></i> 食事記録</h2>
+    <a href="{{ url_for('meals.add') }}" class="btn btn-primary">
+        <i class="bi bi-plus-circle"></i> 食事を追加
+    </a>
+</div>
+
+<!-- 日付選択 -->
+<div class="card mb-4">
+    <div class="card-body">
+        <form method="GET" class="row g-3 align-items-center">
+            <div class="col-auto">
+                <label for="date" class="col-form-label">日付:</label>
+            </div>
+            <div class="col-auto">
+                <input type="date" class="form-control" id="date" name="date"
+                       value="{{ selected_date.strftime('%Y-%m-%d') }}"
+                       onchange="this.form.submit()">
+            </div>
+            <div class="col-auto">
+                <a href="{{ url_for('meals.index', date=(selected_date - timedelta(days=1)).strftime('%Y-%m-%d')) }}"
+                   class="btn btn-outline-secondary btn-sm">
+                    <i class="bi bi-chevron-left"></i> 前日
+                </a>
+                <a href="{{ url_for('meals.index', date=(selected_date + timedelta(days=1)).strftime('%Y-%m-%d')) }}"
+                   class="btn btn-outline-secondary btn-sm">
+                    翌日 <i class="bi bi-chevron-right"></i>
+                </a>
+                {% if selected_date != today %}
+                <a href="{{ url_for('meals.index') }}" class="btn btn-outline-primary btn-sm ms-2">
+                    今日
+                </a>
+                {% endif %}
+            </div>
+        </form>
+    </div>
+</div>
+
+<!-- 1日の合計 -->
+<div class="card mb-4 bg-light">
+    <div class="card-body">
+        <h5 class="card-title">1日の合計</h5>
+        <div class="row text-center">
+            <div class="col">
+                <div class="fs-4 fw-bold text-primary">{{ daily_totals.calories }}</div>
+                <small class="text-muted">kcal</small>
+            </div>
+            <div class="col">
+                <div class="fs-4 fw-bold text-danger">{{ daily_totals.protein }}g</div>
+                <small class="text-muted">タンパク質</small>
+            </div>
+            <div class="col">
+                <div class="fs-4 fw-bold text-warning">{{ daily_totals.fat }}g</div>
+                <small class="text-muted">脂質</small>
+            </div>
+            <div class="col">
+                <div class="fs-4 fw-bold text-success">{{ daily_totals.carbs }}g</div>
+                <small class="text-muted">炭水化物</small>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- 食事一覧 -->
+{% if meals %}
+    {% for meal in meals %}
+    <div class="card mb-3">
+        <div class="card-header d-flex justify-content-between align-items-center">
+            <span>
+                <strong>{{ meal.get_meal_type_display() }}</strong>
+                <span class="badge bg-secondary ms-2">
+                    {{ meal.get_total_nutrition().calories }} kcal
+                </span>
+            </span>
+            <div>
+                <a href="{{ url_for('meals.detail', meal_id=meal.id) }}" class="btn btn-sm btn-outline-primary">
+                    <i class="bi bi-eye"></i> 詳細
+                </a>
+                <a href="{{ url_for('meals.edit', meal_id=meal.id) }}" class="btn btn-sm btn-outline-secondary">
+                    <i class="bi bi-pencil"></i> 編集
+                </a>
+            </div>
+        </div>
+        <div class="card-body">
+            {% if meal.items.count() > 0 %}
+            <ul class="list-unstyled mb-0">
+                {% for item in meal.items %}
+                <li>
+                    {{ item.food.name }} - {{ item.quantity }}g
+                    <small class="text-muted">({{ item.get_nutrition().calories }} kcal)</small>
+                </li>
+                {% endfor %}
+            </ul>
+            {% else %}
+            <p class="text-muted mb-0">食品が登録されていません</p>
+            {% endif %}
+        </div>
+    </div>
+    {% endfor %}
+{% else %}
+<div class="alert alert-info">
+    <i class="bi bi-info-circle"></i>
+    {{ selected_date.strftime('%Y年%m月%d日') }}の食事記録はありません。
+    <a href="{{ url_for('meals.add') }}">食事を追加</a>しましょう。
+</div>
+{% endif %}
+{% endblock %}
+
+{% block scripts %}
+<script>
+    // timedelta を Jinja2 で使えるようにするためのワークアラウンド
+</script>
+{% endblock %}
